@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Classic Fables Hebrew Reader: Audio</title>
+<meta name="description" content="Audio recordings of the five stories in Classic Fables Hebrew Reader, by John Launchbury.">
+<style>
+  :root {
+    --bg: #fbf7ef;
+    --card: #ffffff;
+    --text: #2b2a28;
+    --muted: #6b665d;
+    --accent: #c4562b;
+    --line: #e6dfd1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1d1c1a;
+      --card: #272522;
+      --text: #f0ebe1;
+      --muted: #a8a193;
+      --accent: #e8825a;
+      --line: #3a3732;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.55 Georgia, "Iowan Old Style", "Times New Roman", serif;
+  }
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 48px; }
+  header { text-align: center; margin-bottom: 28px; }
+  header img {
+    width: 180px; height: 180px; object-fit: cover;
+    border-radius: 14px; border: 1px solid var(--line);
+  }
+  h1 { font-size: 1.7rem; line-height: 1.2; margin: 18px 0 4px; }
+  .by { color: var(--muted); margin: 0; }
+  .intro { margin: 20px 0 28px; color: var(--text); }
+  .story {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px 16px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .story h2 { font-size: 1.1rem; margin: 0; }
+  .he { color: var(--text); font-size: 1.5rem; font-weight: 700; line-height: 1.3; margin: 4px 0 10px; }
+  .intro a { color: var(--accent); }
+  audio { display: block; width: 100%; min-width: 0; max-width: 300px; margin: 0 auto; }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+  .meta a { color: var(--accent); }
+  footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="cover.jpg" alt="Cover of Classic Fables Hebrew Reader: a fox, crows, a hare and a tortoise in a forest">
+    <h1>Classic Fables Hebrew Reader</h1>
+    <p class="by">Audio recordings &middot; John Launchbury</p>
+  </header>
+
+  <p class="intro">Listen to each story read aloud in Hebrew. Follow along in the book, or listen first and then read. The book is available on <a href="https://www.amazon.com/Classic-Fables-Hebrew-Reader/dp/B0HCF5FSD6" rel="noopener">Amazon</a>.</p>
+
+  <section class="story">
+    <h2>The Three Billy Goats</h2>
+    <p class="he" lang="he" dir="rtl">שלושת התישים</p>
+    <audio controls preload="none" src="audio/01-three-billy-goats.mp3"></audio>
+    <p class="meta">3 min 39 s &middot; <a href="audio/01-three-billy-goats.mp3" download>Download MP3</a></p>
+  </section>
+
+  <section class="story">
+    <h2>The Tortoise and the Hare</h2>
+    <p class="he" lang="he" dir="rtl">הצב והארנב</p>
+    <audio controls preload="none" src="audio/02-tortoise-and-hare.mp3"></audio>
+    <p class="meta">2 min 29 s &middot; <a href="audio/02-tortoise-and-hare.mp3" download>Download MP3</a></p>
+  </section>
+
+  <section class="story">
+    <h2>Stone Soup</h2>
+    <p class="he" lang="he" dir="rtl">מרק אבנים</p>
+    <audio controls preload="none" src="audio/03-stone-soup.mp3"></audio>
+    <p class="meta">3 min 12 s &middot; <a href="audio/03-stone-soup.mp3" download>Download MP3</a></p>
+  </section>
+
+  <section class="story">
+    <h2>The North Wind and the Sun</h2>
+    <p class="he" lang="he" dir="rtl">הרוח הצפונית והשמש</p>
+    <audio controls preload="none" src="audio/04-north-wind-and-sun.mp3"></audio>
+    <p class="meta">2 min 27 s &middot; <a href="audio/04-north-wind-and-sun.mp3" download>Download MP3</a></p>
+  </section>
+
+  <section class="story">
+    <h2>The Ugly Duckling</h2>
+    <p class="he" lang="he" dir="rtl">הברווזון המכוער</p>
+    <audio controls preload="none" src="audio/05-ugly-duckling.mp3"></audio>
+    <p class="meta">4 min 2 s &middot; <a href="audio/05-ugly-duckling.mp3" download>Download MP3</a></p>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 John Launchbury. All rights reserved.</p>
+  </footer>
+</main>
+</body>
+</html>
