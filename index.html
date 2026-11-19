@@ -56,6 +56,20 @@
   .meta { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
   .meta a { color: var(--accent); }
   footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; text-align: center; }
+  .speed {
+    position: sticky; top: 0; z-index: 1;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin: 0 -16px 18px; padding: 10px 16px;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+  }
+  .speed button {
+    font: inherit; font-size: 0.95rem; color: var(--text);
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 16px; min-height: 40px; cursor: pointer;
+  }
+  .speed button:disabled { color: var(--muted); opacity: 0.5; cursor: default; }
+  .speed button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .speed output { min-width: 5.5em; text-align: center; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -67,6 +81,12 @@
   </header>
 
   <p class="intro">These are the five stories in the Hebrew reader, available on <a href="https://www.amazon.com/Classic-Fables-Hebrew-Reader/dp/B0HCF5FSD6" rel="noopener">Amazon</a>. Follow along in the book, or listen first and then read.</p>
+
+  <div class="speed" role="group" aria-label="Playback speed" hidden>
+    <button type="button" id="slower">Slower</button>
+    <output id="rate" aria-live="polite">Speed 1&times;</output>
+    <button type="button" id="faster">Faster</button>
+  </div>
 
   <section class="story">
     <h2>The Three Billy Goats</h2>
@@ -107,5 +127,41 @@
     <p>&copy; 2026 John Launchbury. All rights reserved.</p>
   </footer>
 </main>
+<script>
+  // One speed control for every player on the page. The choice is not stored between visits.
+  (function () {
+    var bar = document.querySelector('.speed');
+    var slower = document.getElementById('slower');
+    var faster = document.getElementById('faster');
+    var label = document.getElementById('rate');
+    var players = document.querySelectorAll('audio');
+    if (!bar || !players.length || !('playbackRate' in players[0])) return;
+    var steps = [0.8, 0.9, 1, 1.1, 1.2];
+    var i = steps.indexOf(1);
+
+    function apply(player) {
+      player.defaultPlaybackRate = steps[i];
+      player.playbackRate = steps[i];
+    }
+    function update() {
+      players.forEach(apply);
+      label.textContent = 'Speed ' + steps[i] + '×';
+      slower.disabled = i === 0;
+      faster.disabled = i === steps.length - 1;
+    }
+    slower.addEventListener('click', function () { if (i > 0) { i--; update(); } });
+    faster.addEventListener('click', function () { if (i < steps.length - 1) { i++; update(); } });
+    // A player may reset its speed when it loads its file, so set it again on play.
+    // Only one story plays at a time: starting one pauses any other.
+    players.forEach(function (p) {
+      p.addEventListener('play', function () {
+        apply(p);
+        players.forEach(function (other) { if (other !== p && !other.paused) other.pause(); });
+      });
+    });
+    update();
+    bar.hidden = false;
+  })();
+</script>
 </body>
 </html>
