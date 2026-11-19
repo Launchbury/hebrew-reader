@@ -53,6 +53,20 @@
   .intro a { color: var(--accent); }
   .nw { white-space: nowrap; }
   audio { display: block; width: 100%; min-width: 0; max-width: 300px; margin: 0 auto; }
+  /* Our own player (built by the script below; without scripts the native player shows). */
+  .player { display: flex; align-items: center; gap: 12px; max-width: 340px; margin: 0 auto; }
+  .player .play {
+    flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+    background: var(--accent); color: #fff; cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .player .play:focus-visible, .player .seek:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .player .play svg { width: 18px; height: 18px; fill: currentColor; }
+  .player .play .i-pause { display: none; }
+  .player .play[data-playing="true"] .i-play { display: none; }
+  .player .play[data-playing="true"] .i-pause { display: block; }
+  .player .seek { flex: 1; min-width: 0; height: 32px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+  .player .time { flex: none; color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .meta { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
   .meta a { color: var(--accent); }
   footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; text-align: center; }
@@ -91,35 +105,35 @@
   <section class="story">
     <h2>The Three Billy Goats</h2>
     <p class="he" lang="he" dir="rtl">שלושת התישים</p>
-    <audio controls preload="none" src="audio/01-three-billy-goats.mp3"></audio>
+    <audio controls preload="metadata" src="audio/01-three-billy-goats.mp3"></audio>
     <p class="meta">3 min 39 s &middot; <a href="audio/01-three-billy-goats.mp3" download>Download MP3</a></p>
   </section>
 
   <section class="story">
     <h2>The Tortoise and the Hare</h2>
     <p class="he" lang="he" dir="rtl">הצב והארנב</p>
-    <audio controls preload="none" src="audio/02-tortoise-and-hare.mp3"></audio>
+    <audio controls preload="metadata" src="audio/02-tortoise-and-hare.mp3"></audio>
     <p class="meta">2 min 29 s &middot; <a href="audio/02-tortoise-and-hare.mp3" download>Download MP3</a></p>
   </section>
 
   <section class="story">
     <h2>Stone Soup</h2>
     <p class="he" lang="he" dir="rtl">מרק אבנים</p>
-    <audio controls preload="none" src="audio/03-stone-soup.mp3"></audio>
+    <audio controls preload="metadata" src="audio/03-stone-soup.mp3"></audio>
     <p class="meta">3 min 12 s &middot; <a href="audio/03-stone-soup.mp3" download>Download MP3</a></p>
   </section>
 
   <section class="story">
     <h2>The North Wind and the Sun</h2>
     <p class="he" lang="he" dir="rtl">הרוח הצפונית והשמש</p>
-    <audio controls preload="none" src="audio/04-north-wind-and-sun.mp3"></audio>
+    <audio controls preload="metadata" src="audio/04-north-wind-and-sun.mp3"></audio>
     <p class="meta">2 min 27 s &middot; <a href="audio/04-north-wind-and-sun.mp3" download>Download MP3</a></p>
   </section>
 
   <section class="story">
     <h2>The Ugly Duckling</h2>
     <p class="he" lang="he" dir="rtl">הברווזון המכוער</p>
-    <audio controls preload="none" src="audio/05-ugly-duckling.mp3"></audio>
+    <audio controls preload="metadata" src="audio/05-ugly-duckling.mp3"></audio>
     <p class="meta">4 min 2 s &middot; <a href="audio/05-ugly-duckling.mp3" download>Download MP3</a></p>
   </section>
 
@@ -128,6 +142,70 @@
   </footer>
 </main>
 <script>
+  // Our own players: play/pause button, scrubber and time, replacing the browser's built-in controls.
+  (function () {
+    function fmt(s) {
+      if (!isFinite(s) || s < 0) s = 0;
+      var m = Math.floor(s / 60), r = Math.floor(s % 60);
+      return m + ':' + (r < 10 ? '0' : '') + r;
+    }
+    document.querySelectorAll('.story').forEach(function (card) {
+      var audio = card.querySelector('audio');
+      if (!audio) return;
+      var title = card.querySelector('h2').textContent;
+      audio.removeAttribute('controls');
+
+      var box = document.createElement('div');
+      box.className = 'player';
+      box.innerHTML =
+        '<button type="button" class="play" data-playing="false" aria-label="Play ' + title + '">' +
+          '<svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>' +
+          '<svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>' +
+        '</button>' +
+        '<input type="range" class="seek" min="0" max="1000" step="1" value="0" aria-label="Position in ' + title + '">' +
+        '<span class="time">0:00 / 0:00</span>';
+      audio.parentNode.insertBefore(box, audio);
+
+      var btn = box.querySelector('.play');
+      var seek = box.querySelector('.seek');
+      var time = box.querySelector('.time');
+      var dragging = false;
+
+      function show() {
+        var d = audio.duration, t = audio.currentTime;
+        var ok = isFinite(d) && d > 0;
+        var total = ok ? Math.round(d) : 0;           // rounded, to match the "3 min 39 s" text below
+        var now = (ok && audio.ended) ? total : t;     // show the full length when finished
+        time.textContent = fmt(now) + ' / ' + fmt(total);
+        if (!dragging) seek.value = ok ? Math.round(t / d * 1000) : 0;
+        seek.setAttribute('aria-valuetext', fmt(now) + ' of ' + fmt(total));
+      }
+      function state() {
+        var playing = !audio.paused;
+        btn.dataset.playing = playing;
+        btn.setAttribute('aria-label', (playing ? 'Pause ' : 'Play ') + title);
+      }
+
+      btn.addEventListener('click', function () {
+        if (audio.paused) { audio.play().catch(function () {}); } else { audio.pause(); }
+      });
+      seek.addEventListener('pointerdown', function () { dragging = true; });
+      ['pointerup', 'pointercancel', 'change', 'blur'].forEach(function (ev) {
+        seek.addEventListener(ev, function () { dragging = false; show(); });
+      });
+      seek.addEventListener('input', function () {
+        var d = audio.duration;
+        if (isFinite(d) && d > 0) audio.currentTime = seek.value / 1000 * d;
+        show();
+      });
+      ['timeupdate', 'loadedmetadata', 'durationchange', 'seeked', 'ended'].forEach(function (ev) {
+        audio.addEventListener(ev, show);
+      });
+      ['play', 'pause', 'ended'].forEach(function (ev) { audio.addEventListener(ev, state); });
+      show();
+    });
+  })();
+
   // One speed control for every player on the page. The choice is not stored between visits.
   (function () {
     var bar = document.querySelector('.speed');
